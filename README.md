@@ -100,7 +100,7 @@ with tf.Session() as sess:
 
 ## Contributing
 
-Contributions are welcome! Please submit your pull requests or issues through GitHub.
+Contributions are welcome! Please submit your pull requests or issues through GitHub. We aim to improve this library and make it an alternative to Keras.
 
 ## License
 
