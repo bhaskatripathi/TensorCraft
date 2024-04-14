@@ -26,48 +26,77 @@ TensorCraft is easy to install and integrate into your existing TensorFlow workf
 
 ## Example Usage
 
-Here's a quick example showing how to set up a text classification model using pre-trained GloVe embeddings.
+Here's a quick example showing how to set up a sequential data forecasting model for time series prediction using LSTM cells from TensorCraft.
 
 ### Import Required Modules
 
 First, import the necessary modules from TensorCraft along with TensorFlow:
 
-    from TensorCraft.zoo import GloveEmbeddingLayer
-    from TensorCraft.dense import DenseLayer, DenseClassifier
-    import tensorflow as tf
-
-### Load GloVe Embeddings
-
-Assuming you have a CSV file containing GloVe embeddings, you can load them like this:
-
-    glove_layer = GloveEmbeddingLayer.from_csv('path_to_glove.csv', embedding_dim=50, trainable=False)
+```python
+from TensorCraft.recurrent import LSTMCell, StatefulUnit
+from TensorCraft.dense import DenseLayer
+import tensorflow as tf
+import numpy as np
+```
 
 ### Define the Model
 
-Set up a classifier with the Glove embedding layer:
+```python
+input_dim = 1  # Assuming one feature per time step
+hidden_units = 50  # Number of LSTM units
+output_dim = 1  # Forecasting one step ahead
 
-    classifier = DenseClassifier.from_description(input_dim=50, num_classes=2, layer_sizes=[100], act_funcs=[tf.nn.relu])
-    inputs = tf.placeholder(tf.int32, shape=[None, 10])  # batch_size x sequence_length
-    labels = tf.placeholder(tf.float32, shape=[None, 2])  # batch_size x num_classes
-    logits = classifier.process(inputs)
+# Create LSTM cell
+lstm_cell = LSTMCell.from_description(input_dim + hidden_units, hidden_units, tf.tanh)
+
+# Create stateful unit to maintain state across time steps
+lstm_network = StatefulUnit(lstm_cell)
+
+# Define dense layer to map LSTM outputs to the forecasted values
+output_layer = DenseLayer.from_description(hidden_units, output_dim, act=None)
+```
+
+### Load your data
+
+```python
+data = np.sin(np.linspace(0, 100, 1000))  # Example data: Sine wave
+sequence_length = 10  # Use 10 time steps to predict the next step
+
+# Function to create sequences from data
+def create_sequences(data, seq_length):
+    xs, ys = [], []
+    for i in range(len(data) - seq_length):
+        xs.append(data[i:i+seq_length])
+        ys.append(data[i+seq_length])
+    return np.array(xs), np.array(ys)
+
+x_train, y_train = create_sequences(data, sequence_length)
+x_train = np.expand_dims(x_train, axis=2)  # Shape: [num_samples, sequence_length, 1]
+y_train = np.expand_dims(y_train, axis=1)  # Shape: [num_samples, 1]
+```
 
 ### Training Configuration
 
-Configure the training operations:
+#Configure the training operations:
+```python
+inputs = tf.placeholder(tf.float32, [None, sequence_length, 1])
+labels = tf.placeholder(tf.float32, [None, 1])
+outputs = lstm_network.process(inputs)[-1]  # Only take the last output for prediction
+predictions = output_layer.process(outputs)
 
-    loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=logits, labels=labels))
-    optimizer = tf.train.AdamOptimizer(0.01).minimize(loss)
+loss = tf.reduce_mean(tf.square(predictions - labels))  # Mean squared error
+optimizer = tf.train.AdamOptimizer(0.01).minimize(loss)
+```
 
 ### Train the Model
-
-Execute the training session:
-
-    with tf.Session() as sess:
-        sess.run(tf.global_variables_initializer())
-        for step in range(100):
-            batch_inputs, batch_labels = get_next_batch()  # Implement this function
-            _, loss_val = sess.run([optimizer, loss], feed_dict={inputs: batch_inputs, labels: batch_labels})
-            print("Step:", step, "Loss:", loss_val)
+```python
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+    for epoch in range(100):
+        _, loss_val = sess.run([optimizer, loss], feed_dict={inputs: x_train, labels: y_train})
+        if epoch % 10 == 0:
+            print(f'Epoch {epoch}, Loss: {loss_val}')
+```
 
 ## Contributing
 
