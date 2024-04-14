@@ -1,5 +1,8 @@
 # TensorCraft
-TensorCraft is a Python library tailored for building, training, and deploying neural networks using TensorFlow. It provides high-level constructs specifically designed to enhance the customization and flexibility of model development. TensorCraft is engineered to cater to both general and specialized needs, offering advanced control over TensorFlow operations and configurations that go beyond the typical use cases addressed by Keras.
+TensorCraft is a Python library tailored for building, training, and deploying neural networks using TensorFlow. It provides high-level constructs specifically designed to enhance the customization and flexibility of model development. TensorCraft is engineered to cater to both general and specialized needs, offering advanced control over TensorFlow operations and configurations that go beyond the typical use cases addressed by Keras. 
+
+## Problem it solves
+While Keras is designed to be modular and user-friendly, its simplicity can be a drawback when it comes to highly specialized or unconventional neural network architectures. Users who need to implement non-standard layers, custom training loops, or unique optimization algorithms may find Keras restrictive.
 
 ## Core Features and Philosophies
 
@@ -100,7 +103,7 @@ with tf.Session() as sess:
 
 ## Contributing
 
-Contributions are welcome! Please submit your pull requests or issues through GitHub. We aim to improve this library and make it an alternative to Keras.
+Contributions are welcome! Please submit your pull requests or issues through GitHub. We aim to improve this library and make it an alternative to Keras. If you like this repository then please give a star rating.
 
 ## License
 
