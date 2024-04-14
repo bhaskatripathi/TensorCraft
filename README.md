@@ -104,4 +104,4 @@ Contributions are welcome! Please submit your pull requests or issues through Gi
 
 ## License
 
-TensorCraft is released under the MIT License. See the LICENSE file for more details.
+TensorCraft is released under the MIT License 2024. See the LICENSE file for more details.
